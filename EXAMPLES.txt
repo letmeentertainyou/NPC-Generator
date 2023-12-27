@@ -1,0 +1,25 @@
+This file contains example NPCs created with the files provide. You can upgrade the included tables for more options.
+
+---
+
+Bernice Newton, female, Dwarf/Cleric, Lv. 1.
+Red hair, Ember eyes, Toffee skin.
+hp 12, dc 12, spd 30, str 12, int 12, dex 12, wis 15, con 13, cha 13, hit 8
+Quirks: Owes a life debt to the local lich king. Can't pronounce the word adventure.
+Motivation: Hates their local mayor.
+
+---
+
+Nancy Carter, female, Human/Ranger, Lv. 1.
+Red hair, Gray eyes, Charcoal skin.
+hp 13, dc 13, spd 35, str 16, int 12, dex 14, wis 11, con 11, cha 11, hit 10
+Quirks: Hates broccoli and brings it up often. Owes a life debt to the local lich king.
+Motivation: Wants to learn to fly an airship.
+
+---
+
+William Carter, male, Gnome/Paladin, Lv. 1.
+Yellow hair, Golden eyes, Ashen skin.
+hp 13, dc 12, spd 30, str 14, int 14, dex 12, wis 11, con 11, cha 15, hit 10
+Quirks: Can't pronounce the word adventure. Hates broccoli and brings it up often.
+Motivation: Hates the government for poisoning their town's water supply.
