@@ -1,4 +1,6 @@
-This file contains example NPCs created with the files provide. You can upgrade the included tables for more options.
+This file contains example NPCs created with the tables I provided with this repo.
+For license reasons I couldn't include the full tables. See the README for some tips
+on how to extend those table.
 
 ---
 
