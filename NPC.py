@@ -27,7 +27,6 @@ class NPC:
         self.race = read_table("race")
         self.job = read_table("jobs")
         self.stats = render_stats(self)
-
         self.hair = read_table("hair")
         self.eyes = read_table("eyes")
         self.skin = read_table("skin_tone")
@@ -36,9 +35,13 @@ class NPC:
 
     def __repr__(self) -> str:
         """
-        This allows you to cleanly write the NPC to the console or a file.
+        This allows you to cleanly write the NPC to the console or a file. It's unfortunately
+        a little sloppy with 12 attributes, I thought about have it print four different lines but
+        __repr__ must return a string so it remains until I rethink the API.
         """
-        return f"{self.first_name} {self.last_name}, {self.gender}, {self.race}/{self.job}, Lv. {self.level}.\n{self.hair} hair, {self.eyes} eyes, {self.skin} skin.\n{self.stats}\nQuirks: {self.quirks}\nMotivation: {self.motiv}"
+        return f"{self.first_name} {self.last_name}, {self.gender}, {self.race}/{self.job}, Lv.{self.level}.\
+        \n{self.hair} hair, {self.eyes} eyes, {self.skin} skin.\n{self.stats}\
+        \nQuirks: {self.quirks}\nMotivation: {self.motiv}"
 
 
 def read_table(filename: str, count: int = 1):
@@ -46,7 +49,7 @@ def read_table(filename: str, count: int = 1):
     If count is 1 then this grabs a random choice from the given table. Otherwise
     it grabs count choices using random.sample to avoid duplicates.
 
-    That second feature is only used for quirks in this file but it can extended to any DND
+    That second feature is only used for quirks in this file but it can be extended to any DND
     table you can imagine!
     """
     with open(f"tables/{filename}.txt", "r", encoding="UTF-8") as tmpfile:
