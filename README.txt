@@ -16,7 +16,7 @@ Without any arguments a level one character will be created.
 You can also give a single integer as an argument to generate a character at that level.
 $ python3 NPC.py 20
 
-Note that NPC.py needs to be in the same directory as the tables/directory or nothing will happen.
+Note that NPC.py needs to be in the same directory as the tables/ directory or nothing will happen.
 
 ---
 
