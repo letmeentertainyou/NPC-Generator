@@ -33,16 +33,13 @@ and HTTPs when visiting random websites.
 Female Names:
 https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/female.txt
 
-
 Male Names:
 https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/male.txt
-
 
 Family Names:
 The family names list is unsorted, and contains duplicates of every name. As well as names that
 don't contain any vowels which are useless in English. You can adjust that list with a few
 simple commands in Bash/Python. Good luck, and God Speed!
-
 https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/other/family.txt
 
 
@@ -51,13 +48,10 @@ This link is an awesome resource that really inspired my creativity. There are o
 and a few of them are repetitive or don't seem fun to role-play. I just read through the list and
 picked out my favorite 70ish. This should get you started and you can easily add more as you think
 of them.
-
 https://kindlepreneur.com/character-quirks/
-
 
 Motivations:
 These are 30 very well written prompts!
-
 https://www.writerswrite.co.za/30-character-motivations-to-kickstart-your-story/
 
 
@@ -67,5 +61,4 @@ to use it and I recommend you copy that table yourself. I did need more creative
 for eyes and skin-tones and so I have provided the full tables that I wrote after doing a fair
 amount of research. Feel free to use the provided eyes/skin-tones tables for any OGL/CC compatible
 purposes.
-
 https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
