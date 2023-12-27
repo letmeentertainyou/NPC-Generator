@@ -9,22 +9,15 @@ from random import choice, sample
 from itertools import cycle
 
 
-def read_table(filename: str, count: int = 1):
-    """This just gets a random line from a given file in the tables dir."""
-    with open(f"tables/{filename}.txt", "r", encoding="UTF-8") as tmpfile:
-        lines = [line.strip() for line in tmpfile.readlines()]
-    if count == 1:
-        return choice(lines)
-    else:
-        return " ".join(sample(lines, count))
-
-
 class NPC:
-    """A neat object for containing all if an NPC's info. You could easily import this into
-    a larger project that needs NPCs!"""
+    """
+    A neat object for containing all of an NPC's info. You could easily import this into
+    a larger project that needs NPCs!
+    """
 
     def __init__(self, level: int = 1):
-        """First name uses gender to determine which list of names to use.
+        """
+        First name uses gender to determine which list of names to use.
         If the gender is other then it randomly picks between male/female names.
         """
         self.level: int = level
@@ -42,38 +35,62 @@ class NPC:
         self.motiv = read_table("motivations")
 
     def __repr__(self) -> str:
-        """This allows you to cleanly write the NPC to the console or a file."""
+        """
+        This allows you to cleanly write the NPC to the console or a file.
+        """
         return f"{self.first_name} {self.last_name}, {self.gender}, {self.race}/{self.job}, Lv. {self.level}.\n{self.hair} hair, {self.eyes} eyes, {self.skin} skin.\n{self.stats}\nQuirks: {self.quirks}\nMotivation: {self.motiv}"
 
 
-def first_name_gen(C: NPC):
-    if C.gender == "other":
-        name_gender = choice(["male", "female"])
+def read_table(filename: str, count: int = 1):
+    """
+    If count is 1 then this grabs a random choice from the given table. Otherwise
+    it grabs count choices using random.sample to avoid duplicates.
+
+    That second feature is only used for quirks in this file but it can extended to any DND
+    table you can imagine!
+    """
+    with open(f"tables/{filename}.txt", "r", encoding="UTF-8") as tmpfile:
+        lines = [line.strip() for line in tmpfile.readlines()]
+    if count == 1:
+        return choice(lines)
     else:
-        name_gender = C.gender
+        return " ".join(sample(lines, count))
+
+
+def first_name_gen(C: NPC):
+    """
+    This handles the other gender object by choosing from the male/female names at random.
+    You could absolutely extend this with a third non-binary list of names instead.
+    """
+    name_gender = C.gender
+    if name_gender == "other":
+        name_gender = choice(["male", "female"])
     return read_table(name_gender)
 
 
 def dice(x: int = 20):
-    """This can be any dice in the game, and can easily be used for hp or attack rolls.
+    """
+    This can be any dice in the game, and can easily be used for hp or attack rolls.
     x defaults to 20 for ease of use but I recommend using real dice for role-play and digital
     dice for mass generation.
     """
     if x < 2:
-        print("The smallest dice you can roll is two sided but you tried {x}.")
+        print(f"The smallest dice you can roll is two sided but you tried {x}.")
         return 0
     return choice(range(1, x + 1))
 
 
 def modify(stat: int):
-    """This takes any stat value and returns it's modifier. You may also do this in your
+    """
+    This takes any stat value and returns it's modifier. You may also do this in your
     head but Python needs the formula.
     """
     return (stat - 10) // 2
 
 
 def calc_hp(level: int, con: int, hit: int):
-    """This is the standard DND HP formula per level. This can be used
+    """
+    This is the standard DND HP formula per level. This can be used
     to calculate fully legal player character HP stats.
 
     All you need is the characters level, constitution and hit dice.
@@ -99,10 +116,10 @@ def render_stats(C: NPC):
     documented here but the books should have that info.
 
     You can modify a lot by simply changing the starting stats dict at the top of the func because
-    all the other calculations are additive. You can even set someone to negative starting
-    stats for some reason.
+    all the other calculations are additive. You can even set the starting stats to be negative for
+    nerfed NPCs.
 
-    hit refers to the hit dice for a given NPC throughout this function.
+    The word "hit" refers to the hit dice for a given NPC throughout this function.
     """
 
     # Base stats, adjust as needed.
@@ -134,7 +151,7 @@ def render_stats(C: NPC):
 
     # This is six points focused on the given classes preferred stats.
     # This helps the random NPC have a little focus without min-maxing.
-    # And it tracks HP hit dice too!
+    # And it tracks the NPC's hit dice too!
     class_bonuses: dict = {
         "Barbarian": [("con", 4), ("str", 2), ("hit", 12)],
         "Bard": [("cha", 4), ("int", 2), ("hit", 8)],
@@ -193,7 +210,7 @@ def render_stats(C: NPC):
 
 
 if __name__ == "__main__":
-    # No need for argv is this is being used as a module!
+    # No need for argv if this is being used as a module!
     from sys import argv
 
     # This cleverly handles the IndexError and the ValueError with the same default value.
