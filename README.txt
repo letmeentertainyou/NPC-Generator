@@ -42,7 +42,6 @@ don't contain any vowels which are useless in English. You can adjust that list 
 simple commands in Bash/Python. Good luck, and God Speed!
 https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/other/family.txt
 
-
 Quirks:
 This link is an awesome resource that really inspired my creativity. There are over 200 quirks listed
 and a few of them are repetitive or don't seem fun to role-play. I just read through the list and
@@ -53,7 +52,6 @@ https://kindlepreneur.com/character-quirks/
 Motivations:
 These are 30 very well written prompts!
 https://www.writerswrite.co.za/30-character-motivations-to-kickstart-your-story/
-
 
 Hair, Eyes, Skin-tone:
 This link has almost the exact same table for all three attributes. I liked their hair table enough
