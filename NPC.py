@@ -15,23 +15,23 @@ class NPC:
     a larger project that needs NPCs!
     """
 
-    def __init__(self, level: int = 1):
+    def __init__(self, level: int = 1) -> None:
         """
         First name uses gender to determine which list of names to use.
         If the gender is other then it randomly picks between male/female names.
         """
         self.level: int = level
-        self.gender = read_table("genders")
-        self.first_name = first_name_gen(self)
-        self.last_name = read_table("family")
-        self.race = read_table("race")
-        self.job = read_table("jobs")
-        self.stats = render_stats(self)
-        self.hair = read_table("hair")
-        self.eyes = read_table("eyes")
-        self.skin = read_table("skin_tone")
-        self.quirks = read_table("quirks", 2)
-        self.motiv = read_table("motivations")
+        self.gender: str = read_table("genders")
+        self.first_name: str = first_name_gen(self)
+        self.last_name: str = read_table("family")
+        self.race: str = read_table("race")
+        self.job: str = read_table("jobs")
+        self.stats: str = render_stats(self)
+        self.hair: str = read_table("hair")
+        self.eyes: str = read_table("eyes")
+        self.skin: str = read_table("skin_tone")
+        self.quirks: str = read_table("quirks", 2)
+        self.motiv: str = read_table("motivations")
 
     def __repr__(self) -> str:
         """
@@ -39,12 +39,17 @@ class NPC:
         a little sloppy with 12 attributes, I thought about have it print four different lines but
         __repr__ must return a string so it remains until I rethink the API.
         """
-        return f"{self.first_name} {self.last_name}, {self.gender}, {self.race}/{self.job}, Lv.{self.level}.\
-        \n{self.hair} hair, {self.eyes} eyes, {self.skin} skin.\n{self.stats}\
-        \nQuirks: {self.quirks}\nMotivation: {self.motiv}"
+
+        # I just learned this weird string data structure thing!
+        _repr: str = (
+            f"{self.first_name} {self.last_name}, {self.gender}, {self.race}/{self.job}, "
+            f"Lv.{self.level}.\n{self.hair} hair, {self.eyes} eyes, {self.skin} skin."
+            f"\n{self.stats}\nQuirks: {self.quirks}\nMotivation: {self.motiv}"
+        )
+        return _repr
 
 
-def read_table(filename: str, count: int = 1):
+def read_table(filename: str, count: int = 1) -> str:
     """
     If count is 1 then this grabs a random choice from the given table. Otherwise
     it grabs count choices using random.sample to avoid duplicates.
@@ -54,36 +59,37 @@ def read_table(filename: str, count: int = 1):
     """
     with open(f"tables/{filename}.txt", "r", encoding="UTF-8") as tmpfile:
         lines = [line.strip() for line in tmpfile.readlines()]
+
     if count == 1:
         return choice(lines)
-    else:
-        return " ".join(sample(lines, count))
+
+    return " ".join(sample(lines, count))
 
 
-def first_name_gen(C: NPC):
+def first_name_gen(npc: NPC) -> str:
     """
-    This handles the other gender object by choosing from the male/female names at random.
-    You could absolutely extend this with a third non-binary list of names instead.
+    This handles the "other" gender by choosing from the male/female names at random.
+    You could absolutely extend this with a third list of non-binary first names.
     """
-    name_gender = C.gender
+    name_gender = npc.gender
     if name_gender == "other":
         name_gender = choice(["male", "female"])
     return read_table(name_gender)
 
 
-def dice(x: int = 20):
+def dice(size: int = 20) -> int:
     """
     This can be any dice in the game, and can easily be used for hp or attack rolls.
     x defaults to 20 for ease of use but I recommend using real dice for role-play and digital
     dice for mass generation.
     """
-    if x < 2:
-        print(f"The smallest dice you can roll is two sided but you tried {x}.")
+    if size < 2:
+        print(f"The smallest dice you can roll is two sided but you tried {size}.")
         return 0
-    return choice(range(1, x + 1))
+    return choice(range(1, size + 1))
 
 
-def modify(stat: int):
+def modify(stat: int) -> int:
     """
     This takes any stat value and returns it's modifier. You may also do this in your
     head but Python needs the formula.
@@ -91,15 +97,15 @@ def modify(stat: int):
     return (stat - 10) // 2
 
 
-def calc_hp(level: int, con: int, hit: int):
+def calc_hp(level: int, con: int, hit: int) -> int:
     """
     This is the standard DND HP formula per level. This can be used
     to calculate fully legal player character HP stats.
 
     All you need is the characters level, constitution and hit dice.
     """
-    mod = modify(con)
-    hp = mod + hit
+    mod: int = modify(con)
+    hp: int = mod + hit
     if level == 1:
         return hp
 
@@ -108,9 +114,7 @@ def calc_hp(level: int, con: int, hit: int):
     return hp
 
 
-# C stands for character in this function, I didn't want to confuse it
-# with "cha" which stands for charisma.
-def render_stats(C: NPC):
+def render_stats(npc: NPC) -> str:
     """
     This one function does a lot and holds many internal dicts. But it allows
     us to fully calculate the stats of an NPC at any level with any race/class combo.
@@ -171,28 +175,28 @@ def render_stats(C: NPC):
     }
 
     # These lines add race bonuses
-    race = race_bonuses[C.race]
+    race = race_bonuses[npc.race]
     for pair in race:
         key, val = pair[0], pair[1]
         stats[key] += val
 
     # These lines add class bonuses
-    cls = class_bonuses[C.job]
+    cls = class_bonuses[npc.job]
     for pair in cls:
         key, val = pair[0], pair[1]
         stats[key] += val
 
     # The stat pool starts at 21 because the class already spent six points. There is an additional
     # point per level beyond level 1.
-    pool: int = 21 + ((C.level - 1) * 1)
-    count = 0
+    pool: int = 21 + ((npc.level - 1) * 1)
+    count: int = 0
     # This cycle just puts one point in each stat until the pool is empty.
     for stat in cycle(["str", "int", "dex", "wis", "con", "cha"]):
         if pool < 1:
             break
 
         # Tried to stop NPCs from putting too many points into any one stat at level 1.
-        if stats[stat] < 18 + C.level // 4:
+        if stats[stat] < 18 + npc.level // 4:
             stats[stat] += 1
             pool -= 1
         else:
@@ -203,12 +207,12 @@ def render_stats(C: NPC):
             break
 
     # This is fully DND legal HP.
-    stats["hp"] += calc_hp(C.level, stats["con"], stats["hit"])
+    stats["hp"] += calc_hp(npc.level, stats["con"], stats["hit"])
 
     # Maybe add the level // 4 or something.
-    stats["dc"] += modify(stats["dex"]) + (C.level // 4)
+    stats["dc"] += modify(stats["dex"]) + (npc.level // 4)
 
-    res = ", ".join([f"{k} {v}" for k, v in stats.items()])
+    res: str = ", ".join([f"{k} {v}" for k, v in stats.items()])
     return res
 
 
@@ -218,8 +222,8 @@ if __name__ == "__main__":
 
     # This cleverly handles the IndexError and the ValueError with the same default value.
     try:
-        level = int(argv[1])
+        npc_level = int(argv[1])
     except:
-        level = 1
+        npc_level = 1
 
-    print(NPC(level))
+    print(NPC(level=npc_level))
