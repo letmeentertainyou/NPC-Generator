@@ -46,15 +46,15 @@ https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/other/family.txt
 
 
 Quirks:
-There are over 200 quirks on this link and a few of them are repetitive or don't seem fun to role-play. I just read 
-through the list and picked out my favorite 70 or so. This should get you started and you can easily add more as you 
-think of them.
+This link is an awesome resource that really inspired my creativity. There are over 200 quirks on listed and a few of 
+them are repetitive or don't seem fun to role-play. I just read through the list and picked out my favorite 70 or so. 
+This should get you started and you can easily add more as you think of them.
 
 https://kindlepreneur.com/character-quirks/
 
 
 Motivations:
-This list is shorter than the quirks and I had no desire to modify it. These are 30 very well written prompts!
+These are 30 very well written prompts!
 
 https://www.writerswrite.co.za/30-character-motivations-to-kickstart-your-story/
 
@@ -63,6 +63,6 @@ Hair, Eyes, Skin-tone:
 This link has almost the exact same table for all three attributes. I liked their hair table enough to use it and I
 recommend you copy that table yourself. I did need more creative/expressive colors for eyes and skin-tones and so I
 have provided the full tables that I wrote after doing a fair amount of research. Feel free to use the provided 
-eyes/skin-tones tables for any MIT license compatible purposes.
+eyes/skin-tones tables for any OGL/CC compatible purposes.
 
 https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
