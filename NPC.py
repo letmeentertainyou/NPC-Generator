@@ -17,7 +17,8 @@ class NPC:
 
     def __init__(self, level: int = 1) -> None:
         """
-        Randomly chooses all the traits for the NPC from the include tables.
+        Randomly chooses all the traits for the NPC from the include tables. NPCs have a "job"
+        attribute instead of "class" because using self.class is illegal in Python.
         """
         self.level: int = level
         self.gender: str = read_table("genders")
@@ -29,7 +30,7 @@ class NPC:
         self.quirks: str = read_table("quirks", 2)
         self.motiv: str = read_table("motivations")
         self.race: str = read_table("race")
-        self.job: str = read_table("jobs")
+        self.job: str = read_table("class")
         self.stats: dict = generate_stats(self)
 
     def __repr__(self) -> str:
@@ -60,16 +61,16 @@ class NPC:
 def shuffled(iterable):
     """
     This function is a drop in replacement for random.shuffle() that returns the shuffled iterator
-    instead of none. It behaves the same way that sorted() and reversed() do.
+    instead of None. It behaves the same way that sorted() and reversed() do.
     """
     return sample(iterable, len(iterable))
 
 
 def read_table(filename: str, count: int = 1) -> str:
     """
-    The functions either grabs a random line from a file if count is 1 or it grabs a sample of size
-    count from the file instead. That second feature is only used for the quirks table in this file
-    but it can be extended to any DND table you can imagine!
+    This functions either grabs a random line from a file if count is 1 or it grabs a sample of
+    size count from the file instead. That second feature is only used for the quirks table in this
+    file but it can be extended to any DND table you can imagine!
     """
     with open(f"tables/{filename}.txt", "r", encoding="UTF-8") as tmpfile:
         lines = [line.strip() for line in tmpfile.readlines()]
@@ -106,7 +107,6 @@ def base_stats() -> dict:
     a class for this but I don't need dot access and so I realized a function that prefills
     a struct is all you need.
     """
-
     stats: dict = {
         "hp": 3,
         "dc": 11,
@@ -204,6 +204,7 @@ def generate_stats(npc: NPC) -> dict:
     # This dict helps put a few stat points into an NPC's class
     # It also tracks the class based hit dice.
     class_bonuses: dict = {
+        "Artificer": [("int", 3), ("dex", 2), ("hit", 8)],
         "Barbarian": [("con", 3), ("str", 2), ("hit", 12)],
         "Bard": [("cha", 3), ("int", 2), ("hit", 8)],
         "Cleric": [("wis", 3), ("cha", 2), ("hit", 8)],
