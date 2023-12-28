@@ -2,7 +2,7 @@
 """
 This script reads from a series of tables and assembles an NPC from them.
 
-If you make changes to the default stats dict in render_stats you can balance 
+If you make changes to the default stats dict in generate_stats you can balance 
 this according to the power of the players that you have.
 """
 from random import choice, sample
@@ -17,21 +17,20 @@ class NPC:
 
     def __init__(self, level: int = 1) -> None:
         """
-        First name uses gender to determine which list of names to use.
-        If the gender is other then it randomly picks between male/female names.
+        Randomly chooses all the traits for the NPC from the include tables.
         """
         self.level: int = level
         self.gender: str = read_table("genders")
-        self.first_name: str = first_name_gen(self)
+        self.first_name: str = read_table(self.gender)
         self.last_name: str = read_table("family")
-        self.race: str = read_table("race")
-        self.job: str = read_table("jobs")
-        self.stats: str = render_stats(self)
         self.hair: str = read_table("hair")
         self.eyes: str = read_table("eyes")
-        self.skin: str = read_table("skin_tone")
+        self.skin: str = read_table("skin-tones")
         self.quirks: str = read_table("quirks", 2)
         self.motiv: str = read_table("motivations")
+        self.race: str = read_table("race")
+        self.job: str = read_table("jobs")
+        self.stats: dict = generate_stats(self)
 
     def __repr__(self) -> str:
         """
@@ -44,18 +43,33 @@ class NPC:
         _repr: str = (
             f"{self.first_name} {self.last_name}, {self.gender}, {self.race}/{self.job}, "
             f"Lv.{self.level}.\n{self.hair} hair, {self.eyes} eyes, {self.skin} skin."
-            f"\n{self.stats}\nQuirks: {self.quirks}\nMotivation: {self.motiv}"
+            f"\n{self.__stat_repr__()}\nQuirks: {self.quirks}\nMotivation: {self.motiv}"
         )
         return _repr
+
+    def __stat_repr__(self) -> str:
+        """
+        Joins self.stats into a string for console output. This used to be part of the
+        generate_stats() function but I moved it out because passing the stats dict
+        seems more useful for extending this module.
+        """
+        res: str = ", ".join([f"{k} {v}" for k, v in self.stats.items()])
+        return res
+
+
+def shuffled(iterable):
+    """
+    This function is a drop in replacement for random.shuffle() that returns the shuffled iterator
+    instead of none. It behaves the same way that sorted() and reversed() do.
+    """
+    return sample(iterable, len(iterable))
 
 
 def read_table(filename: str, count: int = 1) -> str:
     """
-    If count is 1 then this grabs a random choice from the given table. Otherwise
-    it grabs count choices using random.sample to avoid duplicates.
-
-    That second feature is only used for quirks in this file but it can be extended to any DND
-    table you can imagine!
+    The functions either grabs a random line from a file if count is 1 or it grabs a sample of size
+    count from the file instead. That second feature is only used for the quirks table in this file
+    but it can be extended to any DND table you can imagine!
     """
     with open(f"tables/{filename}.txt", "r", encoding="UTF-8") as tmpfile:
         lines = [line.strip() for line in tmpfile.readlines()]
@@ -64,17 +78,6 @@ def read_table(filename: str, count: int = 1) -> str:
         return choice(lines)
 
     return " ".join(sample(lines, count))
-
-
-def first_name_gen(npc: NPC) -> str:
-    """
-    This handles the "other" gender by choosing from the male/female names at random.
-    You could absolutely extend this with a third list of non-binary first names.
-    """
-    name_gender = npc.gender
-    if name_gender == "other":
-        name_gender = choice(["male", "female"])
-    return read_table(name_gender)
 
 
 def dice(size: int = 20) -> int:
@@ -97,6 +100,63 @@ def modify(stat: int) -> int:
     return (stat - 10) // 2
 
 
+def base_stats() -> dict:
+    """
+    You can modify the base stats for your whole project here. I wanted something like
+    a class for this but I don't need dot access and so I realized a function that prefills
+    a struct is all you need.
+    """
+
+    stats: dict = {
+        "hp": 3,
+        "dc": 11,
+        "spd": 5,
+        "str": 8,
+        "int": 8,
+        "dex": 8,
+        "wis": 8,
+        "con": 8,
+        "cha": 8,
+        "hit": 0,
+    }
+    return stats
+
+
+def apply_stats_bonuses(stats: dict, attributes: dict) -> dict:
+    """
+    Applies the entries in an attributes dict to the stats dict.
+
+    This is only used for classes and races for now, but it can be extended to include
+    new systems later and that's why I made it modular.
+    """
+    for pair in attributes:
+        key, val = pair[0], pair[1]
+        stats[key] += val
+    return stats
+
+
+def apply_stat_pool(stats: dict, npc: NPC) -> dict:
+    """
+    The calculates a pool of stats which starts at 22 (subtracting five for the class_bonuses).
+    NPCs get an extra stat point per level beyond level 1 to boost their stats a bit. This can
+    be modified per use case.
+
+    After the stat pool is calculated this function cycles between the six dnd stats and adds
+    one point each until the pool is empty. I also shuffle the dnd stat pool for each new character
+    so that atk isn't the default highest stat for everyone!
+    """
+
+    pool: int = 22 + ((npc.level - 1) * 1)
+    for stat in cycle(shuffled(["str", "int", "dex", "wis", "con", "cha"])):
+        if pool < 1:
+            break
+
+        # You could put a stat ceiling here but I removed mine for simplicity.
+        stats[stat] += 1
+        pool -= 1
+    return stats
+
+
 def calc_hp(level: int, con: int, hit: int) -> int:
     """
     This is the standard DND HP formula per level. This can be used
@@ -114,36 +174,21 @@ def calc_hp(level: int, con: int, hit: int) -> int:
     return hp
 
 
-def render_stats(npc: NPC) -> str:
+def generate_stats(npc: NPC) -> dict:
     """
-    This one function does a lot and holds many internal dicts. But it allows
-    us to fully calculate the stats of an NPC at any level with any race/class combo.
+    I don't really know where to put the two bonuses dicts they feel weirdly isolated as globals
+    and I don't want to read them from a file because that makes distribution harder.
+
+    So these function contains two bonuses dictionaries and it generates a fresh base_stat
+    and then applies an NPCs bonuses and stat pool to calculate every stat they need to have.
 
     You have to track race/class abilities yourself. Things like dark-vision are not
     documented here but the books should have that info.
 
-    You can modify a lot by simply changing the starting stats dict at the top of the func because
-    all the other calculations are additive. You can even set the starting stats to be negative for
-    nerfed NPCs.
-
     The word "hit" refers to the hit dice for a given NPC throughout this function.
     """
 
-    # Base stats, adjust as needed.
-    stats: dict = {
-        "hp": 3,
-        "dc": 11,
-        "spd": 5,
-        "str": 8,
-        "int": 8,
-        "dex": 8,
-        "wis": 8,
-        "con": 8,
-        "cha": 8,
-        "hit": 0,
-    }
-
-    # These are the movement speed and stat values given for each race.
+    # These are base stat values given for each race.
     race_bonuses: dict = {
         "Dragonborn": [("spd", 30), ("str", 2), ("cha", 1)],
         "Dwarf": [("spd", 25), ("con", 2)],
@@ -156,64 +201,36 @@ def render_stats(npc: NPC) -> str:
         "Tiefling": [("spd", 30), ("int", 1), ("cha", 2)],
     }
 
-    # This is six points focused on the given classes preferred stats.
-    # This helps the random NPC have a little focus without min-maxing.
-    # And it tracks the NPC's hit dice too!
+    # This dict helps put a few stat points into an NPC's class
+    # It also tracks the class based hit dice.
     class_bonuses: dict = {
-        "Barbarian": [("con", 4), ("str", 2), ("hit", 12)],
-        "Bard": [("cha", 4), ("int", 2), ("hit", 8)],
-        "Cleric": [("wis", 4), ("cha", 2), ("hit", 8)],
-        "Druid": [("wis", 4), ("dex", 2), ("hit", 8)],
-        "Fighter": [("str", 4), ("con", 2), ("hit", 10)],
-        "Monk": [("dex", 4), ("wis", 2), ("hit", 8)],
-        "Paladin": [("cha", 4), ("str", 2), ("hit", 10)],
-        "Ranger": [("str", 4), ("dex", 2), ("hit", 10)],
-        "Rogue": [("dex", 4), ("cha", 2), ("hit", 8)],
-        "Sorcerer": [("con", 4), ("int", 2), ("hit", 6)],
-        "Warlock": [("int", 4), ("con", 2), ("hit", 8)],
-        "Wizard": [("int", 4), ("wis", 2), ("hit", 6)],
+        "Barbarian": [("con", 3), ("str", 2), ("hit", 12)],
+        "Bard": [("cha", 3), ("int", 2), ("hit", 8)],
+        "Cleric": [("wis", 3), ("cha", 2), ("hit", 8)],
+        "Druid": [("wis", 3), ("dex", 2), ("hit", 8)],
+        "Fighter": [("str", 3), ("con", 2), ("hit", 10)],
+        "Monk": [("dex", 3), ("wis", 2), ("hit", 8)],
+        "Paladin": [("cha", 3), ("str", 2), ("hit", 10)],
+        "Ranger": [("str", 3), ("dex", 2), ("hit", 10)],
+        "Rogue": [("dex", 3), ("cha", 2), ("hit", 8)],
+        "Sorcerer": [("con", 3), ("int", 2), ("hit", 6)],
+        "Warlock": [("int", 3), ("con", 2), ("hit", 8)],
+        "Wizard": [("int", 3), ("wis", 2), ("hit", 6)],
     }
 
-    # These lines add race bonuses
-    race = race_bonuses[npc.race]
-    for pair in race:
-        key, val = pair[0], pair[1]
-        stats[key] += val
-
-    # These lines add class bonuses
-    cls = class_bonuses[npc.job]
-    for pair in cls:
-        key, val = pair[0], pair[1]
-        stats[key] += val
-
-    # The stat pool starts at 21 because the class already spent six points. There is an additional
-    # point per level beyond level 1.
-    pool: int = 21 + ((npc.level - 1) * 1)
-    count: int = 0
-    # This cycle just puts one point in each stat until the pool is empty.
-    for stat in cycle(["str", "int", "dex", "wis", "con", "cha"]):
-        if pool < 1:
-            break
-
-        # Tried to stop NPCs from putting too many points into any one stat at level 1.
-        if stats[stat] < 18 + npc.level // 4:
-            stats[stat] += 1
-            pool -= 1
-        else:
-            count += 1
-
-        # This stops infinite looping when all stats are maxed and the pool isn't empty.
-        if count > 1000:
-            break
+    # Start with a blank stat object!
+    stats: dict = base_stats()
+    stats = apply_stats_bonuses(stats, race_bonuses[npc.race])
+    stats = apply_stats_bonuses(stats, class_bonuses[npc.job])
+    stats = apply_stat_pool(stats, npc)
 
     # This is fully DND legal HP.
     stats["hp"] += calc_hp(npc.level, stats["con"], stats["hit"])
 
-    # Maybe add the level // 4 or something.
+    # The base dc gets +1 every four levels.
     stats["dc"] += modify(stats["dex"]) + (npc.level // 4)
 
-    res: str = ", ".join([f"{k} {v}" for k, v in stats.items()])
-    return res
+    return stats
 
 
 if __name__ == "__main__":

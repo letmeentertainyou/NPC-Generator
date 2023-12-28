@@ -36,6 +36,10 @@ https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/female.txt
 Male Names:
 https://www.cs.cmu.edu/Groups/AI/areas/nlp/corpora/names/male.txt
 
+Non-binary Names:
+I would just combine the female + male names tables because a bunch of them feel very neutral but
+you are more than welcome to compile your own non-binary table from any other resources you want!
+
 Family Names:
 The family names list is unsorted, and contains duplicates of every name. As well as names that
 don't contain any vowels which are useless in English. You can adjust that list with a few

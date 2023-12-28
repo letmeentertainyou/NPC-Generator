@@ -1,5 +1,3 @@
 female
-female
 male
-male
-other
+non-binary
